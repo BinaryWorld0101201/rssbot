@@ -33,12 +33,13 @@ class RSSFetcher(object):
         try:
             last_update_time = datetime.fromtimestamp(
                 mktime(d.entries[0].updated_parsed))
-        except AttributeError or IndexError:
-            last_update_time = str(datetime.utcnow()).split('.')[0]
+        except (AttributeError, IndexError):
+            logging.error('{} could not be parsed'.format(url))
+            return []
         entries = []
         for item in d.entries:
             try:
-                if time < datetime.fromtimestamp(mktime(item.published_parsed)):
+                if time < datetime.fromtimestamp(mktime(item.updated_parsed)):
                     entries.append((item.title, item.link))
                 else:
                     break
@@ -64,6 +65,5 @@ class RSSFetcher(object):
 
 if __name__ == '__main__':
     rss = RSSFetcher()
-    for item in rss.list(505057195):
-        print(item[0])
-        print(item[1])
+    url = 'https://distrowatch.com/news/dw.xml'
+    print(rss.get_entries(url))
