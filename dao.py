@@ -104,9 +104,20 @@ class SQLiteDB(object):
         conn.close()
         return ret
 
+    def find_name_by_url(self, url):
+        conn = sqlite3.connect('rss.db')
+        cursor = conn.cursor()
+
+        sql = "SELECT NAME FROM URLS WHERE URL=?;"
+        cursors = cursor.execute(sql, (url,))
+        ret = cursors.fetchone()[0]
+        cursor.close()
+        conn.close()
+        return ret
+
 
 if __name__ == '__main__':
     from datetime import datetime
     db = SQLiteDB()
-    ret = db.find_time_by_url('https://blog.nierunjie.site/atom.xml')
+    ret = db.find_name_by_url('https://blog.nierunjie.site/atom.xml')
     print(ret)

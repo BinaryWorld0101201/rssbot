@@ -12,7 +12,7 @@ class RSSBot(object):
         self.rss_fetcher = RSSFetcher()
         self.updater = Updater(token=token)
         self.dispatcher = self.updater.dispatcher
-        self.updater.job_queue.run_repeating(self.refresh, 60)
+        self.updater.job_queue.run_repeating(self.refresh, 300)
         self.updater.job_queue.start()
 
     def subscribe(self, bot, update):
@@ -34,8 +34,13 @@ class RSSBot(object):
 
     def rss(self, bot, update):
         chat_id = update.message.chat_id
-        text = self.rss_fetcher.list(chat_id)
-        bot.send_message(chat_id, text)
+        url_name = self.rss_fetcher.list(chat_id)
+        text = ""
+        for item in url_name:
+            text += '<a href="{}">{}</a>\n'.format(item[0], item[1])
+        bot.send_message(chat_id, text,
+                         parse_mode='HTML',
+                         disable_web_page_preview=True)
 
     def refresh(self, bot, job):
         urls = self.rss_fetcher.find_all_urls()

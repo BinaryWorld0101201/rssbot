@@ -48,10 +48,16 @@ class RSSFetcher(object):
     def find_chats_by_url(self, url):
         return self.database.find_chats_by_url(url)
 
-    def list(self, url):
-        return self.database.find_urls_by_chat_id(url)
+    def list(self, chat_id):
+        url_name = []
+        for url in self.database.find_urls_by_chat_id(chat_id):
+            name = self.database.find_name_by_url(url)
+            url_name.append((url, name))
+        return url_name
 
 
 if __name__ == '__main__':
     rss = RSSFetcher()
-    rss.update()
+    for item in rss.list(505057195):
+        print(item[0])
+        print(item[1])
