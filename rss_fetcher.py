@@ -3,6 +3,7 @@ import sqlite3
 from datetime import datetime, timedelta
 from time import mktime
 from dao import SQLiteDB
+import logging
 
 
 class RSSFetcher(object):
@@ -36,8 +37,13 @@ class RSSFetcher(object):
             last_update_time = str(datetime.utcnow()).split('.')[0]
         entries = []
         for item in d.entries:
-            if time < datetime.fromtimestamp(mktime(item.published_parsed)):
-                entries.append((item.title, item.link))
+            try:
+                if time < datetime.fromtimestamp(mktime(item.published_parsed)):
+                    entries.append((item.title, item.link))
+                else:
+                    break
+            except AttributeError:
+                logging.error('{} could not be parsed'.format(url))
 
         self.database.update_urls_time(url, str(last_update_time))
         return entries
