@@ -12,7 +12,7 @@ class RSSFetcher(object):
     def is_valid_url(self, url):
         d = feedparser.parse(url)
         try:
-            return d.feed.title
+            return d.entries[0].updated_parsed and d.feed.title
         except:
             return False
 
@@ -26,12 +26,13 @@ class RSSFetcher(object):
     def unsubscribe(self, url, chat_id):
         self.database.delete_relation(url, chat_id)
 
-    def get_entries_after_time(self, url, time):
+    def get_entries(self, url):
         d = feedparser.parse(url)
+        time = datetime.fromisoformat(self.database.find_time_by_url(url))
         try:
             last_update_time = datetime.fromtimestamp(
-                mktime(d.feed.updated_parsed))
-        except AttributeError:
+                mktime(d.entries[0].updated_parsed))
+        except AttributeError or IndexError:
             last_update_time = str(datetime.utcnow()).split('.')[0]
         entries = []
         for item in d.entries:
@@ -41,7 +42,7 @@ class RSSFetcher(object):
         self.database.update_urls_time(url, str(last_update_time))
         return entries
 
-    def find_all_urls_and_time(self):
+    def find_all_urls(self):
         return self.database.find_urls()
 
     def find_chats_by_url(self, url):

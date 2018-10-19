@@ -3,68 +3,110 @@ import logging
 
 
 class SQLiteDB(object):
-    def __init__(self):
-        self.conn = sqlite3.connect('rss.db', check_same_thread=False)
-        self.cursor = self.conn.cursor()
-
     def insert_url(self, url, name):
+        conn = sqlite3.connect('rss.db')
+        cursor = conn.cursor()
         try:
             sql = "INSERT INTO URLS(URL,NAME) VALUES(?,?);"
-            self.cursor.execute(sql, (url, name))
+            cursor.execute(sql, (url, name))
         except sqlite3.IntegrityError:
             pass
-        self.conn.commit()
+        conn.commit()
+        cursor.close()
+        conn.close()
         return True
 
     def insert_relation(self, url, chat_id):
         ret = True
+        conn = sqlite3.connect('rss.db')
+        cursor = conn.cursor()
+
         try:
             sql = "INSERT INTO RELATION VALUES(?,?)"
-            self.cursor.execute(sql, (url, str(chat_id)))
+            cursor.execute(sql, (url, str(chat_id)))
         except sqlite3.IntegrityError:
             pass
         except:
             ret = False
-        self.conn.commit()
+        conn.commit()
+        cursor.close()
+        conn.close()
         return ret
 
     def delete_relation(self, url, chat_id):
+        conn = sqlite3.connect('rss.db')
+        cursor = conn.cursor()
+
         sql = "DELETE FROM RELATION WHERE URL=? AND CHAT_ID=?;"
-        self.cursor.execute(sql, (url, str(chat_id)))
-        self.conn.commit()
+        cursor.execute(sql, (url, str(chat_id)))
+        conn.commit()
+        cursor.close()
+        conn.close()
         return True
 
     def find_urls_by_chat_id(self, chat_id):
+        conn = sqlite3.connect('rss.db')
+        cursor = conn.cursor()
+
         sql = "SELECT URL FROM RELATION WHERE CHAT_ID =?;"
-        cursors = self.cursor.execute(sql, (str(chat_id),))
+        cursors = cursor.execute(sql, (str(chat_id),))
         urls = []
         for item in cursors:
             urls.append(item[0])
+        cursor.close()
+        conn.close()
         return urls
 
     def find_chats_by_url(self, url):
+        conn = sqlite3.connect('rss.db')
+        cursor = conn.cursor()
+
         sql = "SELECT CHAT_ID FROM RELATION WHERE URL =?;"
-        cursors = self.cursor.execute(sql, (str(url),))
+        cursors = cursor.execute(sql, (str(url),))
         chats = []
         for item in cursors:
             chats.append(item[0])
+        cursor.close()
+        conn.close()
         return chats
 
     def update_urls_time(self, url, time):
+        conn = sqlite3.connect('rss.db')
+        cursor = conn.cursor()
+
         sql = "UPDATE URLS SET LAST_UPDATE =? WHERE URL=?;"
-        self.cursor.execute(sql, (time, url))
-        self.conn.commit()
+        cursor.execute(sql, (time, url))
+        conn.commit()
+        cursor.close()
+        conn.close()
 
     def find_urls(self):
-        sql = "SELECT URL,LAST_UPDATE FROM URLS;"
-        cursors = self.cursor.execute(sql)
-        urls = {}
+        conn = sqlite3.connect('rss.db')
+        cursor = conn.cursor()
+
+        sql = "SELECT URL FROM URLS;"
+        cursors = cursor.execute(sql)
+        urls = []
         for item in cursors:
-            urls[item[0]] = item[1]
+            urls.append(item[0])
+        cursor.close()
+        conn.close()
         return urls
+
+    def find_time_by_url(self, url):
+        conn = sqlite3.connect('rss.db')
+        cursor = conn.cursor()
+
+        sql = "SELECT LAST_UPDATE FROM URLS WHERE URL=?;"
+        cursors = cursor.execute(sql, (url,))
+        ret = cursors.fetchone()[0]
+        cursor.close()
+        conn.close()
+        return ret
 
 
 if __name__ == '__main__':
     from datetime import datetime
     db = SQLiteDB()
-    db.update_urls_time('https://www.zhihu.com/rss', str(datetime.utcnow()))
+    ret = db.find_time_by_url('https://blog.nierunjie.site/atom.xml')
+    print(ret)
