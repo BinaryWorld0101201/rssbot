@@ -65,5 +65,6 @@ class RSSFetcher(object):
 
 if __name__ == '__main__':
     rss = RSSFetcher()
-    url = 'https://distrowatch.com/news/dw.xml'
-    print(rss.get_entries(url))
+    url = 'https://nierunjie.github.io/atom.xml'
+    d = feedparser.parse(url)
+    print(d.entries)

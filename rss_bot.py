@@ -20,17 +20,27 @@ class RSSBot(object):
         try:
             url = update.message.text.split(' ')[1]
             ret = self.rss_fetcher.subscribe(url, chat_id)
-            text = ret and '订阅成功' or '订阅失败'
+            if ret:
+                name = self.rss_fetcher.database.find_name_by_url(url)
+                text = '已订阅:<a href="{}">{}</a>'.format(url, name)
+            else:
+                text = '订阅失败'
         except IndexError:
-            text = '请输入正确的格式\n/sub 订阅的URL'
+            text = '请输入正确的格式\n/sub URL'
         bot.send_message(chat_id, text)
 
     def unsubscribe(self, bot, update):
         chat_id = update.message.chat_id
-        url = update.message.text.split(' ')[1]
-        self.rss_fetcher.unsubscribe(url, chat_id)
-        text = '该订阅已成功取消'
-        bot.send_message(chat_id, text)
+        try:
+            url = update.message.text.split(' ')[1]
+            name = self.rss_fetcher.database.find_name_by_url(url)
+            self.rss_fetcher.unsubscribe(url, chat_id)
+            text = '已退订:<a href="{}">{}</a>'.format(url, name)
+        except IndexError:
+            text = '请输入正确的格式\n/unsub URL'
+        bot.send_message(chat_id, text,
+                         parse_mode='HTML',
+                         disable_web_page_preview=True)
 
     def rss(self, bot, update):
         chat_id = update.message.chat_id
