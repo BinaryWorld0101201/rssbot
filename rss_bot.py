@@ -1,5 +1,5 @@
 from telegram.ext import Updater, Job, CommandHandler
-from telegram.error import TelegramError
+from telegram.error import TelegramError, Unauthorized, BadRequest
 from rss_fetcher import RSSFetcher
 from telegram import Bot
 from datetime import datetime
@@ -12,7 +12,7 @@ class RSSBot(object):
         self.rss_fetcher = RSSFetcher()
         self.updater = Updater(token=token)
         self.dispatcher = self.updater.dispatcher
-        self.updater.job_queue.run_repeating(self.refresh, 60*30)
+        self.updater.job_queue.run_repeating(self.refresh, 60)
         self.updater.job_queue.start()
 
     def subscribe(self, bot, update):
@@ -50,8 +50,11 @@ class RSSBot(object):
         chat_id = update.message.chat_id
         url_name = self.rss_fetcher.list(chat_id)
         text = ""
-        for item in url_name:
-            text += '<a href="{}">{}</a>\n'.format(item[0], item[1])
+        if not url_name:
+            text = '暂无订阅'
+        else:
+            for item in url_name:
+                text += '<a href="{}">{}</a>\n'.format(item[0], item[1])
         bot.send_message(chat_id, text,
                          parse_mode='HTML',
                          disable_web_page_preview=True)
@@ -70,10 +73,14 @@ class RSSBot(object):
         for entry in entries:
             text = '<a href="{}">{}</a>'.format(entry[1], entry[0])
             for chat_id in chats:
-                self.bot.send_message(
-                    chat_id, text,
-                    parse_mode='HTML',
-                    disable_web_page_preview=True)
+                try:
+                    self.bot.send_message(
+                        chat_id, text,
+                        parse_mode='HTML',
+                        disable_web_page_preview=True)
+                except (BadRequest, Unauthorized):
+                    self.rss_fetcher.database.delete_all_relation_by_id(
+                        chat_id)
 
     def error(self, bot, update, error):
         try:

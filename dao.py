@@ -44,6 +44,17 @@ class SQLiteDB(object):
         conn.close()
         return True
 
+    def delete_all_relation_by_id(self, chat_id):
+        conn = sqlite3.connect('rss.db')
+        cursor = conn.cursor()
+
+        sql = "DELETE FROM RELATION WHERE CHAT_ID=?;"
+        cursor.execute(sql, (str(chat_id),))
+        conn.commit()
+        cursor.close()
+        conn.close()
+        return True
+
     def find_urls_by_chat_id(self, chat_id):
         conn = sqlite3.connect('rss.db')
         cursor = conn.cursor()
