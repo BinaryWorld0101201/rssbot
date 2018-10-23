@@ -1,6 +1,8 @@
-import sys
 import logging
+import sys
+
 from rss_bot import RSSBot
+
 """
 获取参数启动Bot
 """

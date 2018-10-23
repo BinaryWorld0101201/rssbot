@@ -1,9 +1,10 @@
-import feedparser
-import sqlite3
+import logging
 from datetime import datetime, timedelta
 from time import mktime
+
+import feedparser
+
 from dao import SQLiteDB
-import logging
 
 
 class RSSFetcher(object):

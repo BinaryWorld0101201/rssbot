@@ -1,9 +1,11 @@
-from telegram.ext import Updater, Job, CommandHandler
-from telegram.error import TelegramError, Unauthorized, BadRequest
-from rss_fetcher import RSSFetcher
-from telegram import Bot
-from datetime import datetime
 import threading
+from datetime import datetime
+
+from telegram import Bot
+from telegram.error import BadRequest, Unauthorized
+from telegram.ext import CommandHandler, Job, Updater
+
+from rss_fetcher import RSSFetcher
 
 
 class RSSBot(object):
@@ -85,10 +87,8 @@ class RSSBot(object):
     def error(self, bot, update, error):
         try:
             raise error
-        except TelegramError as e:
+        except Exception as e:
             print(e)
-        except:
-            print(error)
 
     def run(self):
         self.dispatcher.add_handler(CommandHandler('sub', self.subscribe))
