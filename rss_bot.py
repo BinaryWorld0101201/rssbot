@@ -1,8 +1,9 @@
 import threading
+import logging
 from datetime import datetime
 
 from telegram import Bot
-from telegram.error import BadRequest, Unauthorized
+from telegram.error import BadRequest, Unauthorized, TimedOut
 from telegram.ext import CommandHandler, Job, Updater
 
 from rss_fetcher import RSSFetcher
@@ -83,11 +84,13 @@ class RSSBot(object):
                 except (BadRequest, Unauthorized):
                     self.rss_fetcher.database.delete_all_relation_by_id(
                         chat_id)
+                except TimedOut:
+                    logging.error('send message timedout')
 
     def error(self, bot, update, error):
         try:
             raise error
-        except Exception as e:
+        except BaseException as e:
             print(e)
 
     def run(self):
