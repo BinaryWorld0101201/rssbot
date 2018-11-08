@@ -15,7 +15,7 @@ class RSSBot(object):
         self.rss_fetcher = RSSFetcher()
         self.updater = Updater(token=token)
         self.dispatcher = self.updater.dispatcher
-        self.updater.job_queue.run_repeating(self.refresh, 60*30)
+        self.updater.job_queue.run_repeating(self.refresh, 60)
         self.updater.job_queue.start()
 
     def subscribe(self, bot, update):
