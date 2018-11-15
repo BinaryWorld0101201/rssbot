@@ -35,7 +35,7 @@ class RSSFetcher(object):
             last_update_time = datetime.fromtimestamp(
                 mktime(d.entries[0].updated_parsed))
         except (AttributeError, IndexError):
-            logging.error('{} could not be parsed'.format(url))
+            logging.info('{} could not be parsed'.format(url))
             return []
         entries = []
         for item in d.entries:
@@ -45,7 +45,7 @@ class RSSFetcher(object):
                 else:
                     break
             except AttributeError:
-                logging.error('{} could not be parsed'.format(url))
+                logging.info('{} could not be parsed'.format(url))
 
         self.database.update_urls_time(url, str(last_update_time))
         return entries
