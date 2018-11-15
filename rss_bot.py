@@ -80,7 +80,7 @@ class RSSBot(object):
                     self.bot.send_message(
                         chat_id, text,
                         parse_mode='HTML',
-                        disable_web_page_preview=True)
+                        disable_web_page_preview=False)
                 except (BadRequest, Unauthorized):
                     self.rss_fetcher.database.delete_all_relation_by_id(
                         chat_id)
