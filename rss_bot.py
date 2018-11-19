@@ -7,6 +7,7 @@ from telegram.error import BadRequest, Unauthorized, TimedOut
 from telegram.ext import CommandHandler, Job, Updater
 
 from rss_fetcher import RSSFetcher
+from start import start
 
 
 class RSSBot(object):
@@ -94,6 +95,7 @@ class RSSBot(object):
             print(e)
 
     def run(self):
+        self.dispatcher.add_handler(CommandHandler('start', start))
         self.dispatcher.add_handler(CommandHandler('sub', self.subscribe))
         self.dispatcher.add_handler(CommandHandler('unsub', self.unsubscribe))
         self.dispatcher.add_handler(CommandHandler('rss', self.rss))
