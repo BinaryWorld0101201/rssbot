@@ -92,7 +92,7 @@ class RSSBot(object):
         try:
             raise error
         except BaseException as e:
-            print(e)
+            logging.error(e)
 
     def run(self):
         self.dispatcher.add_handler(CommandHandler('start', start))
