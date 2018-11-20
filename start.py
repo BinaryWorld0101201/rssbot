@@ -1,9 +1,11 @@
 def start(bot, update):
     chat_id = update.message.chat_id
-    text = '欢迎使用，希望你玩的开心\n'
+    text = '欢迎使用，玩的开心\n'
+    text += '/rss 查看\n'
+    text += '/sub 订阅\n'
+    text += '/unsub 退订\n'
+    text += '源码：<a href="https://github.com/nierunjie/rssbot">Github</a>，疯狂暗示小星星\n'
     text += '作者：@Lanthora\n'
-    text += '在<a href="https://github.com/nierunjie/rssbot">Github</a>查看源码\n'
-    text += '疯狂暗示小星星\n'
     bot.send_message(chat_id, text,
                      parse_mode='HTML',
                      disable_web_page_preview=True)
