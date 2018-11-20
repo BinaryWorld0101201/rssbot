@@ -8,6 +8,7 @@ from telegram.ext import CommandHandler, Job, Updater
 
 from rss_fetcher import RSSFetcher
 from start import start
+from error import ParseError
 
 
 class RSSBot(object):
@@ -18,6 +19,8 @@ class RSSBot(object):
         self.dispatcher = self.updater.dispatcher
         self.updater.job_queue.run_repeating(self.refresh, 60)
         self.updater.job_queue.start()
+        self.error_times = {}
+        self.error_limit = 60
 
     def subscribe(self, bot, update):
         chat_id = update.message.chat_id
@@ -69,9 +72,26 @@ class RSSBot(object):
             threading.Thread(target=self.update, args=(url,)).start()
 
     def update(self, url):
-        entries = self.rss_fetcher.get_entries(url)
-        chats = self.rss_fetcher.find_chats_by_url(url)
-        self.send(entries, chats)
+        try:
+            entries = self.rss_fetcher.get_entries(url)
+            chats = self.rss_fetcher.find_chats_by_url(url)
+            self.error_times[url] = 0
+            self.send(entries, chats)
+        except ParseError as e:
+            self.error_times[url] = self.error_times.setdefault(url, 0) + 1
+            if self.error_times[url] > self.error_limit:
+                name = self.rss_fetcher.database.find_name_by_url(url)
+                text = '<a href="{}">{} </a>'.format(url, name)
+                text += '解析错误次数过多，已被移除，请检查无误后重新订阅'
+                chats = self.rss_fetcher.find_chats_by_url(url)
+                self.rss_fetcher.database.delete_url(url)
+                for chat_id in chats:
+                    self.bot.send_message(
+                        chat_id, text,
+                        parse_mode='HTML',
+                        disable_web_page_preview=True)
+            else:
+                logging.error('{} Times {}'.format(e,self.error_times[url]))
 
     def send(self, entries, chats):
         for entry in entries:

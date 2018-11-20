@@ -5,6 +5,7 @@ from time import mktime
 import feedparser
 
 from dao import SQLiteDB
+from error import ParseError
 
 
 class RSSFetcher(object):
@@ -35,8 +36,8 @@ class RSSFetcher(object):
             last_update_time = datetime.fromtimestamp(
                 mktime(d.entries[0].updated_parsed))
         except (AttributeError, IndexError):
-            logging.info('{} could not be parsed'.format(url))
-            return []
+            raise ParseError(url)
+
         entries = []
         for item in d.entries:
             try:
@@ -45,7 +46,7 @@ class RSSFetcher(object):
                 else:
                     break
             except AttributeError:
-                logging.info('{} could not be parsed'.format(url))
+                raise ParseError(url)
 
         self.database.update_urls_time(url, str(last_update_time))
         return entries

@@ -104,6 +104,11 @@ class SQLiteDB(object):
         conn.close()
         return urls
 
+    def delete_url(self, url):
+        chats = self.find_chats_by_url(url)
+        for chat_id in chats:
+            self.delete_relation(url, chat_id)
+
     def find_time_by_url(self, url):
         conn = sqlite3.connect('rss.db')
         cursor = conn.cursor()
