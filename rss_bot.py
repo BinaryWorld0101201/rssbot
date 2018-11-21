@@ -17,7 +17,7 @@ class RSSBot(object):
         self.rss_fetcher = RSSFetcher()
         self.updater = Updater(token=token)
         self.dispatcher = self.updater.dispatcher
-        self.updater.job_queue.run_repeating(self.refresh, 60)
+        self.updater.job_queue.run_repeating(self.refresh, 120)
         self.updater.job_queue.start()
         self.error_times = {}
         self.error_limit = 60
@@ -91,7 +91,7 @@ class RSSBot(object):
                         parse_mode='HTML',
                         disable_web_page_preview=True)
             else:
-                logging.error('{} Times {}'.format(e,self.error_times[url]))
+                logging.error('{} Times {}'.format(e, self.error_times[url]))
 
     def send(self, entries, chats):
         for entry in entries:
