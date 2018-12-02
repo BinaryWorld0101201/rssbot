@@ -106,6 +106,7 @@ class RSSBot(object):
     def send(self, entries, chats):
         for entry in entries:
             text = '<a href="{}">{}</a>'.format(entry[1], entry[0])
+            self.broadcast(text)
             for chat_id in chats:
                 try:
                     self.bot.send_message(
@@ -117,6 +118,13 @@ class RSSBot(object):
                         chat_id)
                 except TimedOut:
                     logging.error('send message timedout')
+
+    def broadcast(self, text):
+        self.bot.send_message(
+            "@rssbotchannel",
+            text,
+            parse_mode='HTML',
+            disable_web_page_preview=True)
 
     def error(self, bot, update, error):
         try:
