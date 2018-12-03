@@ -1,5 +1,5 @@
 class LimitedSet():
-    def __init__(self, limit=100):
+    def __init__(self, limit=1024):
         self.limit = limit
         self.current = 0
         self.data = [None]*limit
