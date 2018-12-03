@@ -32,6 +32,7 @@ class RSSFetcher(object):
     def get_entries(self, url):
         d = feedparser.parse(url)
         time = datetime.fromisoformat(self.database.find_time_by_url(url))
+        d.entries.sort(key=lambda item: item.updated_parsed, reverse=True)
         try:
             last_update_time = datetime.fromtimestamp(
                 mktime(d.entries[0].updated_parsed))
@@ -69,4 +70,7 @@ if __name__ == '__main__':
     rss = RSSFetcher()
     url = 'https://nierunjie.github.io/atom.xml'
     d = feedparser.parse(url)
-    print(d.entries)
+
+    d.entries.sort(key=lambda item: item.updated_parsed, reverse=True)
+    for item in d.entries:
+        print(mktime(item.updated_parsed))
