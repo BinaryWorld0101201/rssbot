@@ -6,11 +6,13 @@ import feedparser
 
 from dao import SQLiteDB
 from error import ParseError
+from util import LimitedSet
 
 
 class RSSFetcher(object):
     def __init__(self):
         self.database = SQLiteDB()
+        self.limitedset = LimitedSet()
 
     def is_valid_url(self, url):
         d = feedparser.parse(url)
@@ -42,10 +44,12 @@ class RSSFetcher(object):
         entries = []
         for item in d.entries:
             try:
-                if time < datetime.fromtimestamp(mktime(item.updated_parsed)):
-                    entries.append((item.title, item.link))
-                else:
+                if time >= datetime.fromtimestamp(mktime(item.updated_parsed)):
                     break
+                if self.limitedset.has_element(item.link):
+                    continue
+                else:
+                    entries.append((item.title, item.link))
             except AttributeError:
                 raise ParseError(url)
 

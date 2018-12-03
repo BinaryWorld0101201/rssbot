@@ -1,5 +1,7 @@
 import threading
 import logging
+import time
+import random
 from datetime import datetime
 
 from telegram import Bot
@@ -17,7 +19,8 @@ class RSSBot(object):
         self.rss_fetcher = RSSFetcher()
         self.updater = Updater(token=token)
         self.dispatcher = self.updater.dispatcher
-        self.updater.job_queue.run_repeating(self.refresh, 120)
+        self.frequency = 120
+        self.updater.job_queue.run_repeating(self.refresh, self.frequency)
         self.updater.job_queue.start()
         self.error_times = {}
         self.error_limit = 60
@@ -83,6 +86,7 @@ class RSSBot(object):
 
     def update(self, url):
         try:
+            time.sleep(random.randint(0, self.frequency))
             entries = self.rss_fetcher.get_entries(url)
             chats = self.rss_fetcher.find_chats_by_url(url)
             self.error_times[url] = 0
