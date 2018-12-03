@@ -1,6 +1,3 @@
-import logging
-
-
 class LimitedSet():
     def __init__(self, limit=100):
         self.limit = limit
@@ -9,12 +6,10 @@ class LimitedSet():
 
     def has_element(self, element):
         if element in self.data:
-            logging.info('old url {}'.format(str(element)))
             return True
         else:
             self.current += 1
             self.data[(self.current) % self.limit] = element
-            logging.info('new url {}'.format(str(element)))
             return False
 
 
