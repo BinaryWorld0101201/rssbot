@@ -72,9 +72,11 @@ class RSSBot(object):
     def all(self, bot, update):
         chat_id = update.message.chat_id
         url_and_name = self.rss_fetcher.database.find_all_url_and_name()
+
         text = ''
         for item in url_and_name:
             text += '<a href="{}">{}</a>\n'.format(item[0], item[1])
+
         bot.send_message(chat_id, text,
                          parse_mode='HTML',
                          disable_web_page_preview=True)
