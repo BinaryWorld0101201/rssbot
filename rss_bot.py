@@ -19,7 +19,7 @@ class RSSBot(object):
         self.rss_fetcher = RSSFetcher()
         self.updater = Updater(token=token)
         self.dispatcher = self.updater.dispatcher
-        self.frequency = 120
+        self.frequency = 5*60
         self.updater.job_queue.run_repeating(self.refresh, self.frequency)
         self.updater.job_queue.start()
         self.error_times = {}
