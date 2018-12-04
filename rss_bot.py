@@ -107,7 +107,7 @@ class RSSBot(object):
                         parse_mode='HTML',
                         disable_web_page_preview=True)
             else:
-                logging.error('{} Times {}'.format(e, self.error_times[url]))
+                logging.info('{} Times {}'.format(e, self.error_times[url]))
 
     def send(self, entries, chats):
         for entry in entries:
