@@ -83,12 +83,13 @@ class RSSBot(object):
 
     def refresh(self, bot, job):
         urls = self.rss_fetcher.find_all_urls()
+        delta = self.frequency/len(urls)
         for url in urls:
             threading.Thread(target=self.update, args=(url,)).start()
+            time.sleep(delta)
 
     def update(self, url):
         try:
-            time.sleep(random.randint(0, self.frequency))
             entries = self.rss_fetcher.get_entries(url)
             chats = self.rss_fetcher.find_chats_by_url(url)
             self.error_times[url] = 0

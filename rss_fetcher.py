@@ -71,10 +71,7 @@ class RSSFetcher(object):
 
 
 if __name__ == '__main__':
+    import time
     rss = RSSFetcher()
-    url = 'https://nierunjie.github.io/atom.xml'
-    d = feedparser.parse(url)
-
-    d.entries.sort(key=lambda item: item.updated_parsed, reverse=True)
-    for item in d.entries:
-        print(mktime(item.updated_parsed))
+    urls = rss.find_all_urls()
+    time.sleep(120//len(urls))
