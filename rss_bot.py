@@ -20,7 +20,8 @@ class RSSBot(object):
         self.updater = Updater(token=token)
         self.dispatcher = self.updater.dispatcher
         self.frequency = 5*60
-        self.updater.job_queue.run_repeating(self.refresh, self.frequency)
+        self.updater.job_queue.run_repeating(
+            self.refresh, self.frequency, first=5)
         self.updater.job_queue.start()
         self.error_times = {}
         self.error_limit = 60
@@ -81,6 +82,24 @@ class RSSBot(object):
                          parse_mode='HTML',
                          disable_web_page_preview=True)
 
+    def push(self, bot, update):
+        chat_id = update.message.chat_id
+        try:
+            url = update.message.text.split(' ')[1]
+            ans = self.rss_fetcher.database.find_push(url)
+            ret = self.rss_fetcher.database.update_push(url, not ans)
+            name = self.rss_fetcher.database.find_name_by_url(url)
+            if not ans:
+                text = '已推送:<a href="{}">{}</a>'.format(url, name)
+            else:
+                text = '已取消推送:<a href="{}">{}</a>'.format(url, name)
+        except IndexError:
+            text = '请输入正确的格式\n/push URL'
+
+        bot.send_message(chat_id, text,
+                         parse_mode='HTML',
+                         disable_web_page_preview=True)
+
     def refresh(self, bot, job):
         urls = self.rss_fetcher.find_all_urls()
         delta = self.frequency/len(urls)
@@ -94,6 +113,7 @@ class RSSBot(object):
             chats = self.rss_fetcher.find_chats_by_url(url)
             self.error_times[url] = 0
             self.send(entries, chats)
+            self.broadcast(entries, url)
         except ParseError as e:
             self.error_times[url] = self.error_times.setdefault(url, 0) + 1
             if self.error_times[url] > self.error_limit:
@@ -113,7 +133,6 @@ class RSSBot(object):
     def send(self, entries, chats):
         for entry in entries:
             text = '<a href="{}">{}</a>'.format(entry[1], entry[0])
-            self.broadcast(text)
             for chat_id in chats:
                 try:
                     self.bot.send_message(
@@ -126,12 +145,18 @@ class RSSBot(object):
                 except TimedOut:
                     logging.error('send message timedout')
 
-    def broadcast(self, text):
-        self.bot.send_message(
-            "@rssbotchannel",
-            text,
-            parse_mode='HTML',
-            disable_web_page_preview=True)
+    def broadcast(self, entries, url):
+        if not self.rss_fetcher.database.find_push(url):
+            return
+
+        for entry in entries:
+            text = '<a href="{}">{}</a>'.format(entry[1], entry[0])
+
+            self.bot.send_message(
+                "@rssbotchannel",
+                text,
+                parse_mode='HTML',
+                disable_web_page_preview=True)
 
     def error(self, bot, update, error):
         try:
@@ -145,5 +170,6 @@ class RSSBot(object):
         self.dispatcher.add_handler(CommandHandler('unsub', self.unsubscribe))
         self.dispatcher.add_handler(CommandHandler('rss', self.rss))
         self.dispatcher.add_handler(CommandHandler('all', self.all))
+        self.dispatcher.add_handler(CommandHandler('push', self.push))
         self.dispatcher.add_error_handler(self.error)
         self.updater.start_polling()

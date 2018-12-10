@@ -91,6 +91,16 @@ class SQLiteDB(object):
         cursor.close()
         conn.close()
 
+    def update_push(self, url, push):
+        conn = sqlite3.connect('rss.db')
+        cursor = conn.cursor()
+
+        sql = "UPDATE URLS SET PUSH =? WHERE URL=?;"
+        cursor.execute(sql, (push, url))
+        conn.commit()
+        cursor.close()
+        conn.close()
+
     def find_urls(self):
         conn = sqlite3.connect('rss.db')
         cursor = conn.cursor()
@@ -108,6 +118,17 @@ class SQLiteDB(object):
         chats = self.find_chats_by_url(url)
         for chat_id in chats:
             self.delete_relation(url, chat_id)
+
+    def find_push(self, url):
+        conn = sqlite3.connect('rss.db')
+        cursor = conn.cursor()
+
+        sql = "SELECT PUSH FROM URLS WHERE URL=?;"
+        cursors = cursor.execute(sql, (url,))
+        ret = cursors.fetchone()[0]
+        cursor.close()
+        conn.close()
+        return ret
 
     def find_time_by_url(self, url):
         conn = sqlite3.connect('rss.db')
@@ -139,7 +160,7 @@ class SQLiteDB(object):
         cursors = cursor.execute(sql)
         ret = []
         for item in cursors:
-            ret.append([item[0],item[1]])
+            ret.append([item[0], item[1]])
         cursor.close()
         conn.close()
         return ret
@@ -148,5 +169,5 @@ class SQLiteDB(object):
 if __name__ == '__main__':
     from datetime import datetime
     db = SQLiteDB()
-    ret = db.find_all_url_and_name()
-    print(ret)
+    ret = db.find_push("https://www.solidot.org/index.rss")
+    print(ret != True)
