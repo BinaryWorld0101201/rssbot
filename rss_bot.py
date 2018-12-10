@@ -93,8 +93,8 @@ class RSSBot(object):
                 text = '已推送:<a href="{}">{}</a>'.format(url, name)
             else:
                 text = '已取消推送:<a href="{}">{}</a>'.format(url, name)
-        except IndexError:
-            text = '请输入正确的格式\n/push URL'
+        except (IndexError,TypeError):
+            text = '发生未知错误'
 
         bot.send_message(chat_id, text,
                          parse_mode='HTML',
