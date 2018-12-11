@@ -10,7 +10,9 @@
 [RSSBot](https://t.me/PythonRssBot)
 
 ### 订阅
-订阅Github上的某个仓库
+* Github
 ```
 /sub https://github.com/nierunjie/rssbot/commits/master.atom
 ```
+* 微博
+在[此处](https://api.izgq.net/weibo/)生成新浪微博RSS链接
