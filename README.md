@@ -18,7 +18,9 @@
 |/push|后跟url可设置是否推送到频道，不跟参数则显示已经设置推动到频道的RSS|
 
 ### 订阅
-订阅Github上的某个仓库
+* Github
 ```
 /sub https://github.com/nierunjie/rssbot/commits/master.atom
 ```
+* 微博
+在[此处](https://api.izgq.net/weibo/)生成新浪微博RSS链接
