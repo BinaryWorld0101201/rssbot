@@ -165,6 +165,19 @@ class SQLiteDB(object):
         conn.close()
         return ret
 
+    def find_pushed_url_and_name(self):
+        conn = sqlite3.connect('rss.db')
+        cursor = conn.cursor()
+
+        sql = "SELECT URL,NAME FROM URLS WHERE PUSH = 1"
+        cursors = cursor.execute(sql)
+        ret = []
+        for item in cursors:
+            ret.append([item[0], item[1]])
+        cursor.close()
+        conn.close()
+        return ret
+
 
 if __name__ == '__main__':
     from datetime import datetime

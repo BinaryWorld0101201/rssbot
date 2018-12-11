@@ -93,8 +93,14 @@ class RSSBot(object):
                 text = '已推送:<a href="{}">{}</a>'.format(url, name)
             else:
                 text = '已取消推送:<a href="{}">{}</a>'.format(url, name)
-        except (IndexError,TypeError):
+        except TypeError:
             text = '发生未知错误'
+        except IndexError:
+            url_and_name = self.rss_fetcher.database.find_pushed_url_and_name()
+
+            text = ''
+            for item in url_and_name:
+                text += '<a href="{}">{}</a>\n'.format(item[0], item[1])
 
         bot.send_message(chat_id, text,
                          parse_mode='HTML',
