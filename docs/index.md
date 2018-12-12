@@ -18,7 +18,8 @@
 |/all|查看所有用户的订阅，在这里寻找感兴趣的内容|
 |/sub|订阅，后跟带协议(http 或 https)的url，缺少协议将导致订阅失败|
 |/unsub|退订，与订阅方式完全相同|
-|/push|后跟url可设置是否推送到频道，不跟参数则显示已经设置推动到频道的RSS|
+|/push|后跟url可设置是否推送到频道，不跟参数则显示已经推送到频道的RSS|
 
 ## 其他
-[RSSHub](https://docs.rsshub.app/)万物皆可RSS，虽然放到了其他里，但是这个项目真的很厉害，欢迎尝试
+[RSSHub](https://docs.rsshub.app/)万物皆可RSS，配合RSSBot可应对很多场景。
+
