@@ -138,7 +138,7 @@ class RSSBot(object):
 
     def send(self, entries, chats):
         for entry in entries:
-            text = '<a href="{}">{}</a>'.format(entry[1], entry[0])
+            text = '<b>{}</b>\n<a href="{}">{}</a>'.format(entry[0], entry[1], entry[2])
             for chat_id in chats:
                 try:
                     self.bot.send_message(
@@ -156,8 +156,7 @@ class RSSBot(object):
             return
 
         for entry in entries:
-            text = '<a href="{}">{}</a>'.format(entry[1], entry[0])
-
+            text = '<b>{}</b>\n<a href="{}">{}</a>'.format(entry[0], entry[1], entry[2])
             self.bot.send_message(
                 "@rssbotchannel",
                 text,

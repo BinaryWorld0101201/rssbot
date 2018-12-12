@@ -49,7 +49,7 @@ class RSSFetcher(object):
                 if self.limitedset.has_element(item.link):
                     continue
                 else:
-                    entries.append((item.title, item.link))
+                    entries.append((d.feed.title, item.link, item.title))
             except AttributeError:
                 raise ParseError(url)
 
