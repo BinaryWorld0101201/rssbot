@@ -3,6 +3,24 @@ import sqlite3
 
 
 class SQLiteDB(object):
+    def __init__(self):
+        conn = sqlite3.connect('rss.db')
+        cursor = conn.cursor()
+
+        try:
+            self.find_urls()
+        except sqlite3.OperationalError:
+            sql = """
+            CREATE TABLE URLS( URL VARCHAR(255) PRIMARY KEY NOT NULL, NAME VARCHAR(255) NOT NULL, LAST_UPDATE DATETIME DEFAULT (datetime('now')), PUSH INTGER DEFAULT 0);
+            CREATE TABLE RELATION( URL VARCHAR(255) NOT NULL, CHAT_ID CHARACTER(20) NOT NULL, PRIMARY KEY(URL,CHAT_ID));
+            CREATE TRIGGER IF NOT EXISTS clear AFTER DELETE ON RELATION WHEN (SELECT URL FROM RELATION WHERE URL=OLD.URL LIMIT 1) ISNULL BEGIN DELETE FROM URLS WHERE URL=OLD.URL; END; 
+            """
+            cursor.executescript(sql)
+
+        conn.commit()
+        cursor.close()
+        conn.close()
+
     def insert_url(self, url, name):
         conn = sqlite3.connect('rss.db')
         cursor = conn.cursor()
