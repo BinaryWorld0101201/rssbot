@@ -20,8 +20,7 @@ class RSSBot(object):
         self.updater = Updater(token=token)
         self.dispatcher = self.updater.dispatcher
         self.frequency = 5*60
-        self.updater.job_queue.run_repeating(
-            self.refresh, self.frequency, first=5)
+        self.updater.job_queue.run_repeating(self.refresh, self.frequency, first=5)
         self.updater.job_queue.start()
         self.error_times = {}
         self.error_limit = 60
